@@ -15,7 +15,7 @@ typedef struct listMember
 void displayList(node *headOfList);
 void insertFirst(node **headOfList, int newValue);
 void insertLast(node *headOfList, int newValue);
-void insertAt(node *headOfList, int pos, int newValue);
+void insertAt(node **headOfList, int pos, int newValue);
 
 int main(){
     // Creating the nodes in the heap
@@ -45,7 +45,7 @@ int main(){
 
     // Do #3
     printf("\nInsert at a certain position: \n");
-    insertAt(firstNode, 4, 100);
+    insertAt(&firstNode, 3, 100);
     displayList(firstNode);
 
     return 0;
@@ -58,21 +58,20 @@ void displayList(node *headOfList){
     
     while (currentNode != NULL)
     {
-        printf("\tNode %d: %d \n", i++, currentNode->value);
+        printf("Node %d: %d \n", i++, currentNode->value);
         currentNode = currentNode->next;
     }
     
 }
 
 void insertFirst(node **headOfList, int newValue){
-    // NOTE: Double pointer is used (i.e. **headOfList) so that it will be reflected in the main
+    // NOTE: Double pointer is used (i.e. **headOfList) so that the changes in the head will be reflected in the main
     // Creating a new node in the heap
     node *newNode = (node *) calloc(1, sizeof(node));
     // Assigning a value to the new node
     newNode->value = newValue;
     // Connecting the new node to the existing head of the list
     newNode->next = *headOfList;
-    
     // Making the new node the new head of the list
     *headOfList = newNode;
 }
@@ -93,26 +92,37 @@ void insertLast(node *headOfList, int newValue){
         currentNode = currentNode->next;
     }
 
+    // Connecting the last node to the new node
     currentNode->next = newNode;
 }
 
-void insertAt(node *headOfList, int pos, int newValue){
+// insertAt can be used as a replacement for insertFirst and insertLast
+void insertAt(node **headOfList, int pos, int newValue){
     // Creating a new node in the heap
     node *newNode = (node *) calloc(1, sizeof(node));
     // Assigning a value to the new node
     newNode->value = newValue;
+    newNode->next = NULL; // In case the new node will be the last node
 
     // Traversing the linked list until the desired position
-    node *currentNode = headOfList;
-    node *temp;
+    node *currentNode = *headOfList;
     int i = 1;
 
-    while (i < pos-1)
-    {
-        currentNode = currentNode->next;
-        i++;
-    }
+    if(pos == 1){
+        // Connecting the new node to the existing head of the list
+        newNode->next = *headOfList;
+        //Assigning the new node as the new head of the list
+        (*headOfList) = newNode;
+    } else {
+        while (i < pos-1)
+        {
+            currentNode = currentNode->next;
+            i++;
+        }
     
+    // Assigning what the current node is pointing to, to the new node
     newNode->next = currentNode->next;
+    // Connecting the new node to the desired node
     currentNode->next = newNode;
+    }
 }
